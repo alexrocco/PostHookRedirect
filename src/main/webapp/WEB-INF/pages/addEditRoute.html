@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html layout:decorator="layout/mainLayout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<head>
+<title th:text="#{addEditRoute.title}"></title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="row">
+			<div class="col-md-6">
+				<form action="#" th:action="@{/route/save}" th:object="${routeBean}"
+					method="post" role="form">
+
+					<input type="hidden" th:field="*{id}" />
+
+					<div
+						th:class="${#fields.hasErrors('gitBranch')}? 'form-group has-error' : 'form-group'">
+						<label th:for="${#ids.next('gitBranch')}" th:text="#{addEditRoute.gitBranch}"></label> <input
+							type="text" th:field="*{gitBranch}" class="form-control" /> <span
+							class="help-block" th:each="err : ${#fields.errors('gitBranch')}"
+							th:text="${err}"></span>
+					</div>
+
+					<div
+						th:class="${#fields.hasErrors('urlRedirect')}? 'form-group has-error' : 'form-group'">
+						<label th:for="${#ids.next('urlRedirect')}" th:text="#{addEditRoute.urlRedirect}"></label> <input
+							type="text" th:field="*{urlRedirect}" class="form-control" /> <span
+							class="help-block" th:each="err : ${#fields.errors('urlRedirect')}"
+							th:text="${err}"></span>
+					</div>
+
+					<input type="submit" th:value="#{addEditRoute.save}" class="btn btn-default" />
+				</form>
+			</div>
+		</div>
+
+
+	</div>
+</body>
+</html>

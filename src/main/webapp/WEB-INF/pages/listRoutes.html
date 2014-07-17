@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html layout:decorator="layout/mainLayout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<head>
+<title th:text="#{listRoutes.title}"></title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="row">
+			<div class="col-md-8">
+				<form action="#" th:action="@{/route/add}" method="get">
+					<input type="submit" th:value="#{listRoutes.addRoute}" class="btn btn-default" />
+				</form>
+
+				<table class="table">
+					<thead>
+						<tr>
+							<td th:text="#{listRoutes.table.header.id}"></td>
+							<td th:text="#{listRoutes.table.header.gitBranch}"></td>
+							<td th:text="#{listRoutes.table.header.urlRedirect}"></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="route : ${routes}"
+							th:unless="${#lists.isEmpty(routes)}">
+							<td th:text="${route.id}"></td>
+							<td th:text="${route.gitBranch}"></td>
+							<td th:text="${route.urlRedirect}"></td>
+							<td><a href="#" th:href="@{/route/edit(id=${route.id})}">Edit</a></td>
+							<td><a href="#" th:href="@{/route/delete(id=${route.id})}">Delete</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

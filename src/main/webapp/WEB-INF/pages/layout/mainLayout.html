@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.thymeleaf.org" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="#{appName}"></title>
+
+<link rel="stylesheet" th:href="@{/resources/css/bootstrap.min.css}"></link>
+<link rel="stylesheet" th:href="@{/resources/css/main.css}"></link>
+
+<script th:src="@{/resources/js/bootstrap.min.js}"></script>
+<script th:src="@{/resources/js/jquery-2.1.1.min.js}"></script>
+
+</head>
+<body>
+	<div th:replace="layout/header :: header"></div>
+	<div class="container">
+		<div layout:fragment="content">
+			<h1 th:text="#{appName}"></h1>
+			<p th:text="#{mainLayout.about}"></p>
+		</div>
+	</div>
+</body>
+</html>

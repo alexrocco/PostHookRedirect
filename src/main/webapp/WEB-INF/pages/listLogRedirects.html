@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html layout:decorator="layout/mainLayout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<head>
+<title th:text="#{listLogRedirects.title}"></title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="row">
+			<div class="col-md-8">
+				<table class="table">
+					<thead>
+						<tr>
+							<td th:text="#{listLogRedirects.table.header.id}"></td>
+							<td th:text="#{listLogRedirects.table.header.dateTime}"></td>
+							<td th:text="#{listLogRedirects.table.header.status}"></td>
+							<td th:text="#{listLogRedirects.table.header.gitBranch}"></td>
+							<td th:text="#{listLogRedirects.table.header.urlRedirect}"></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="logredirect : ${logredirects}"
+							th:unless="${#lists.isEmpty(logredirects)}">
+							<td th:text="${logredirect.id}"></td>
+							<td th:text="${{logredirect.dateTime}}"></td>
+							<td th:text="${logredirect.status}"></td>
+							<td th:text="${logredirect.routeBean.gitBranch}"></td>
+							<td th:text="${logredirect.routeBean.urlRedirect}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
