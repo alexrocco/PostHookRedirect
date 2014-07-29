@@ -40,6 +40,8 @@ public class LogRedirectBean {
 	@ManyToOne()
 	private RouteBean routeBean;
 	
+	private String errorMsg;
+	
 
 	public Long getId() {
 		return id;
@@ -71,5 +73,13 @@ public class LogRedirectBean {
 
 	public void setRouteBean(RouteBean routeBean) {
 		this.routeBean = routeBean;
+	}
+	
+	public String getErrorMsg() {
+		return errorMsg;
+	}
+	
+	public void setErrorMsg(String errorMsg) {
+		this.errorMsg = errorMsg;
 	}
 }
