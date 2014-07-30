@@ -1,8 +1,10 @@
 package br.com.posthookredirect.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Locale;
 
@@ -27,63 +29,72 @@ import br.com.posthookredirect.enumeration.Status;
 @Controller
 @RequestMapping(value = "/post")
 public class PostReceiverController {
-	
+
 	@Autowired
 	private RouteRepository routeRepository;
-	
+
 	@Autowired
 	private LogRedirectRepository logRedirectRepository;
-	
+
 	@Autowired
 	private ApplicationContext context;
 
-    @RequestMapping(headers = "Content-Type=application/json", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.OK)
+	@RequestMapping(headers = "Content-Type=application/x-www-form-urlencoded", method = RequestMethod.POST)
+	@ResponseStatus(value = HttpStatus.OK)
 	public void processJsonRepository(@RequestBody String requestBody) {
-        
+		
 		LogRedirectBean logRedirectBean = new LogRedirectBean();
-		logRedirectBean.setDateTime(new Date());
-    	
-		if (!requestBody.isEmpty()) {
-        	JSONObject jsonObject = new JSONObject(requestBody);
-            String gitBranchJson = jsonObject.getJSONArray("commits").getJSONObject(0).getString("branch");
-    	
-            Iterable<RouteBean> routes = routeRepository.findAll();
-            
-            RouteBean routeBean = new RouteBean();
-            for (RouteBean route : routes) {
-            	if (route.getGitBranch().equals(gitBranchJson)) {
-            		routeBean = route;
-            	}
-            }
-            
-            RestTemplate restTemplate = new RestTemplate();
-            String result = null;
-            try {
-            	URL url = new URL(routeBean.getUrlRedirect());
-				result = restTemplate.getForObject(url.toURI(), String.class);
-			} catch (RestClientException | URISyntaxException | MalformedURLException e) {
+
+		try {
+			logRedirectBean.setDateTime(new Date());
+
+			String jsonDecode = URLDecoder.decode(requestBody, "UTF-8");
+
+			if (!jsonDecode.isEmpty()) {
+				JSONObject jsonObject = new JSONObject(jsonDecode);
+				String gitBranchJson = jsonObject.getJSONArray("commits").getJSONObject(0).getString("branch");
+
+				Iterable<RouteBean> routes = routeRepository.findAll();
+
+				RouteBean routeBean = new RouteBean();
+				for (RouteBean route : routes) {
+					if (route.getGitBranch().equals(gitBranchJson)) {
+						routeBean = route;
+					}
+				}
+
+				RestTemplate restTemplate = new RestTemplate();
+
+				URL url = new URL(routeBean.getUrlRedirect());
+				String result = restTemplate.getForObject(url.toURI(), String.class);
+
+				if (result != null) {
+					logRedirectBean.setStatus(Status.SUCCESS);
+				}
+
+				logRedirectBean.setRouteBean(routeBean);
+
+			} else {
 				logRedirectBean.setStatus(Status.FAILED);
-				logRedirectBean.setErrorMsg(e.getMessage());
-			} 
-            
-            if (result != null) {
-                logRedirectBean.setStatus(Status.SUCCESS);
-            }
-            
-            logRedirectBean.setRouteBean(routeBean);
-            
-    	} else {
-    		logRedirectBean.setStatus(Status.FAILED);
-    		logRedirectBean.setErrorMsg(context.getMessage("error.jsonPostNotReceived", null, Locale.getDefault()));
-    	}
-    	
-    	logRedirectRepository.save(logRedirectBean);
-    }
-    
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.OK)
-    public void testHttpRequestGet() {
-    	System.out.println("Worked!");
-    }
+				logRedirectBean.setErrorMsg(context.getMessage("error.jsonPostNotReceived", null, Locale.getDefault()));
+			}
+
+		} catch (RestClientException | URISyntaxException | MalformedURLException | UnsupportedEncodingException e) {
+			logRedirectBean.setStatus(Status.FAILED);
+			logRedirectBean.setErrorMsg(e.getMessage());
+		} finally {
+			if (logRedirectBean.getStatus() == null) {
+				logRedirectBean.setStatus(Status.FAILED);
+				logRedirectBean.setErrorMsg(context.getMessage("error.unexpectedError", null, Locale.getDefault()));
+			}
+			
+			logRedirectRepository.save(logRedirectBean);
+		}
+	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@ResponseStatus(value = HttpStatus.OK)
+	public void testHttpRequestGet() {
+		System.out.println("Worked!");
+	}
 }
