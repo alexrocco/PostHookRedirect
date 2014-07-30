@@ -49,6 +49,11 @@ public class PostReceiverController {
 			logRedirectBean.setDateTime(new Date());
 
 			String jsonDecode = URLDecoder.decode(requestBody, "UTF-8");
+			
+			// Remove the 'payload=' from the begin of JSON, when it exists
+			if(jsonDecode.startsWith("payload=")) {
+				jsonDecode = jsonDecode.substring(8, jsonDecode.length());
+			}
 
 			if (!jsonDecode.isEmpty()) {
 				JSONObject jsonObject = new JSONObject(jsonDecode);
