@@ -13,7 +13,6 @@
 		<hibernate.version>4.0.1.Final</hibernate.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<spring.data>1.6.0.RELEASE</spring.data>
-		<h2.version>1.4.179</h2.version>
 		<hibernate.validator.verison>5.1.1.Final</hibernate.validator.verison>
 		<spring.security.version>3.2.4.RELEASE</spring.security.version>
 	</properties>
@@ -71,14 +70,6 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>${hibernate.validator.verison}</version>
 		</dependency>
-
-		<!-- H2 databse -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>${h2.version}</version>
-		</dependency>
-
 
 		<!-- Servlet API -->
 		<dependency>

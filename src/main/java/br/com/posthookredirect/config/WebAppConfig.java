@@ -8,15 +8,16 @@ import javax.sql.DataSource;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.orm.hibernate4.HibernateExceptionTranslator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -41,6 +42,9 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 @EnableJpaRepositories(basePackages = "br.com.posthookredirect.data")
 @EnableTransactionManagement
 public class WebAppConfig extends WebMvcConfigurerAdapter {
+	
+	@Autowired
+	private Environment env;
 
 	@Bean
 	public ServletContextTemplateResolver templateResolver() {
@@ -82,19 +86,30 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public DataSource dataSource() throws SQLException {
+	public DataSource dataSource() {
+		JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
+		dsLookup.setResourceRef(true);
+		DataSource dataSource = dsLookup
+				.getDataSource("java:jboss/datasources/posthookredirectdb");
+		return dataSource;
 
-		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-		return builder.setType(EmbeddedDatabaseType.H2).build();
+	}
+
+	@Bean
+	public HibernateJpaVendorAdapter jpaVendorAdapter() {
+		HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
+		hibernateJpaVendorAdapter.setShowSql(true);
+		hibernateJpaVendorAdapter.setGenerateDdl(true);
+		hibernateJpaVendorAdapter.setDatabasePlatform(env
+				.getProperty("jdbc.driverClassName"));
+
+		return hibernateJpaVendorAdapter;
 	}
 
 	@Bean
 	public EntityManagerFactory entityManagerFactory() throws SQLException {
-		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		vendorAdapter.setGenerateDdl(true);
-
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-		factory.setJpaVendorAdapter(vendorAdapter);
+		factory.setJpaVendorAdapter(jpaVendorAdapter());
 		factory.setPackagesToScan("br.com.posthookredirect.data");
 		factory.setDataSource(dataSource());
 		factory.afterPropertiesSet();
