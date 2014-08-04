@@ -10,6 +10,8 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	
 		<hibernate.version>4.0.1.Final</hibernate.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<spring.data>1.6.0.RELEASE</spring.data>
@@ -111,6 +113,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
